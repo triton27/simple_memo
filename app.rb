@@ -45,5 +45,29 @@ end
 
 get '/memos/:memo_id/edit' do
   @title = 'Edit memo'
+
+  memo_id = params['memo_id'].to_i
+  memo = @memos.find { |m| m['memo_id'] == memo_id }
+
+  @memo_id = memo_id
+  @memo_title = memo['memo_title']
+  @memo_description = memo['memo_description']
+
   erb :edit
+end
+
+patch '/memos/:memo_id/edit' do
+  memo_id = params['memo_id'].to_i
+
+  @memos.each do |m|
+    next unless m['memo_id'] == memo_id
+
+    m['memo_title'] = params['memo_title']
+    m['memo_description'] = params['memo_description']
+    break
+  end
+
+  File.open(JSON_PATH, 'w') { |file| file.write(JSON.pretty_generate(@memos)) }
+
+  redirect "/memos/#{memo_id}"
 end
