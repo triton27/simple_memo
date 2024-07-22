@@ -1,0 +1,9 @@
+<p>
+  <%= @memo_title %>
+</p>
+<p>
+  <%= @memo_description %>
+</p>
+
+<button onclick="location.href='/memos/<%= @memo_id %>/edit'">変更</button>
+<button onclick="location.href='/memos/<%= @memo_id %>'">削除</button>
