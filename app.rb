@@ -42,7 +42,7 @@ post '/create' do
 
   File.open(JSON_PATH, 'w') { |file| file.write(JSON.pretty_generate(@memos)) }
 
-  erb :top
+  redirect '/'
 end
 
 # 詳細画面表示
