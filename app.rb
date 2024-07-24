@@ -81,3 +81,7 @@ delete '/memos/:memo_id' do
 
   redirect '/'
 end
+
+not_found do
+  '404 Not Found'
+end
