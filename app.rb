@@ -23,11 +23,11 @@ post '/create' do
   memos = Memo.read_memos
 
   memo_id = memos.empty? ? 1 : memos.max_by { |m| m['memo_id'] }['memo_id'] + 1
-  memo_title = params['memo_title'].empty? ? "新しいメモ (#{memo_id})" : params['memo_title']
+  memo_title = params['memo_title'].empty? ? "新しいメモ (#{memo_id})" : h(params['memo_title'])
 
   new_memo = { 'memo_id' => memo_id,
                'memo_title' => memo_title,
-               'memo_description' => params['memo_description'] }
+               'memo_description' => h(params['memo_description']) }
 
   memos << new_memo
 
@@ -60,8 +60,8 @@ patch '/memos/:memo_id' do
   memos.each do |m|
     next unless m['memo_id'] == memo_id
 
-    m['memo_title'] = params['memo_title']
-    m['memo_description'] = params['memo_description']
+    m['memo_title'] = h(params['memo_title'])
+    m['memo_description'] = h(params['memo_description'])
     break
   end
 
@@ -84,4 +84,11 @@ end
 
 not_found do
   '404 Not Found'
+end
+
+# XSS対策
+helpers do
+  def h(text)
+    Rack::Utils.escape_html(text)
+  end
 end
