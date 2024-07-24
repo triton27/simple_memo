@@ -1,6 +1,6 @@
-<form method="post" action="/memos/<%= @memo_id %>">
+<form method="post" action="/memos/<%= @memo.memo_id %>">
   <input type="hidden" name="_method" value="patch">
-  <input type= "text" name="memo_title" value="<%= @memo_title %>">
-  <textarea name="memo_description" rows="5"><%= @memo_description %></textarea>
+  <input type= "text" name="memo_title" value="<%= @memo.memo_title %>">
+  <textarea name="memo_description" rows="5"><%= @memo.memo_description %></textarea>
   <input type= "submit" value="変更">
 </form>
