@@ -4,11 +4,15 @@ require 'json'
 require_relative 'models/memo'
 
 # トップ画面表示
-get '/' do
+get '/memos' do
   @title = 'Top'
   @memos = Memo.read_memos
 
   erb :top
+end
+
+get '/' do
+  redirect '/memos'
 end
 
 # 登録画面表示
@@ -19,67 +23,61 @@ get '/new' do
 end
 
 # 登録処理
-post '/create' do
+post '/memos' do
   memos = Memo.read_memos
 
-  memo_id = memos.empty? ? 1 : memos.max_by { |m| m['memo_id'] }['memo_id'] + 1
-  memo_title = params['memo_title'].empty? ? "新しいメモ (#{memo_id})" : h(params['memo_title'])
+  id = memos.empty? ? 1 : memos.max_by(&:id).id + 1
+  title = params['title'].empty? ? "新しいメモ (#{id})" : params['title']
 
-  new_memo = { 'memo_id' => memo_id,
-               'memo_title' => memo_title,
-               'memo_description' => h(params['memo_description']) }
+  new_memo = Memo.new(id, title, params['description'])
 
   memos << new_memo
 
   Memo.write_memos(memos)
 
-  redirect '/'
+  redirect '/memos'
 end
 
 # 詳細画面表示
-get '/memos/:memo_id' do
+get '/memos/:id' do
   @title = 'Show memo'
-  @memo = Memo.new(params['memo_id'].to_i)
+  @memo = Memo.read_memo(params['id'].to_i)
 
   erb :show
 end
 
 # 編集画面表示
-get '/memos/:memo_id/edit' do
+get '/memos/:id/edit' do
   @title = 'Edit memo'
-  @memo = Memo.new(params['memo_id'].to_i)
+  @memo = Memo.read_memo(params['id'].to_i)
 
   erb :edit
 end
 
 # 編集処理
-patch '/memos/:memo_id' do
+patch '/memos/:id' do
   memos = Memo.read_memos
-  memo_id = params['memo_id'].to_i
+  id = params['id'].to_i
 
-  memos.each do |m|
-    next unless m['memo_id'] == memo_id
-
-    m['memo_title'] = h(params['memo_title'])
-    m['memo_description'] = h(params['memo_description'])
-    break
-  end
+  memo = memos.find { |m| m.id == id }
+  memo.title = params['title']
+  memo.description = params['description']
 
   Memo.write_memos(memos)
 
-  redirect "/memos/#{memo_id}"
+  redirect "/memos/#{id}"
 end
 
 # 削除処理
-delete '/memos/:memo_id' do
+delete '/memos/:id' do
   memos = Memo.read_memos
-  memo_id = params['memo_id'].to_i
+  id = params['id'].to_i
 
-  memos.delete_if { |m| m['memo_id'] == memo_id }
+  memos.delete_if { |m| m.id == id }
 
   Memo.write_memos(memos)
 
-  redirect '/'
+  redirect '/memos'
 end
 
 not_found do
