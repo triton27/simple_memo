@@ -1,7 +1,8 @@
 require 'json'
 
 class Memo
-  attr_accessor :id, :title, :description
+  attr_reader :id
+  attr_accessor :title, :description
 
   JSON_PATH = 'public/memos.json'.freeze
 
@@ -21,7 +22,6 @@ class Memo
     Memo.new(id, memo.title, memo.description)
   end
 
-  # memos: Memoオブジェクトが入ったリスト
   def self.write_memos(memos)
     memos_list = memos.map { |m| { id: m.id, title: m.title, description: m.description } }
 
