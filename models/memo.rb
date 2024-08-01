@@ -23,15 +23,7 @@ class Memo
 
   # memos: Memoオブジェクトが入ったリスト
   def self.write_memos(memos)
-    memos_list = []
-    memos.each do |m|
-      memos_hash = {
-        id: m.id,
-        title: m.title,
-        description: m.description
-      }
-      memos_list << memos_hash
-    end
+    memos_list = memos.map { |m| { id: m.id, title: m.title, description: m.description } }
 
     File.open(JSON_PATH, 'w') { |file| file.write(memos_list.to_json) }
   end
