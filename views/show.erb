@@ -1,0 +1,14 @@
+
+<p>
+  <%= h @memo.title %>
+</p>
+<p>
+  <%= h @memo.description %>
+</p>
+
+<button onclick="location.href='/memos/<%= @memo.id %>/edit'">変更</button>
+
+<form method="post" action="/memos/<%= @memo.id %>">
+  <input type="hidden" name="_method" value="delete">
+  <input type="submit" value="削除">
+</form>
