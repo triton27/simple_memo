@@ -30,6 +30,12 @@ brew services start postgresql
 createdb -O devuser01 simple_memo
 ```
 
+#### 作成した DB に接続
+
+```
+psql -d simple_memo
+```
+
 #### テーブルの作成
 
 ```
