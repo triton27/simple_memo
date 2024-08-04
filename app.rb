@@ -1,6 +1,5 @@
 require 'sinatra'
 require 'sinatra/reloader'
-require 'json'
 require_relative 'models/memo'
 
 # トップ画面表示
@@ -30,10 +29,7 @@ post '/memos' do
   title = params['title'].empty? ? "新しいメモ (#{id})" : params['title']
 
   new_memo = Memo.new(id, title, params['description'])
-
-  memos << new_memo
-
-  Memo.write_memos(memos)
+  Memo.insert_memo(new_memo)
 
   redirect '/memos'
 end
@@ -63,7 +59,7 @@ patch '/memos/:id' do
   memo.title = params['title']
   memo.description = params['description']
 
-  Memo.write_memos(memos)
+  Memo.update_memo(memo)
 
   redirect "/memos/#{id}"
 end
@@ -71,11 +67,8 @@ end
 # 削除処理
 delete '/memos/:id' do
   memos = Memo.read_memos
-  id = params['id'].to_i
-
-  memos.delete_if { |m| m.id == id }
-
-  Memo.write_memos(memos)
+  memo = memos.find { |m| m.id == params['id'].to_i }
+  Memo.delete_memo(memo)
 
   redirect '/memos'
 end

@@ -1,18 +1,35 @@
-require 'json'
+require 'pg'
+require 'yaml'
 
 class Memo
   attr_reader :id
   attr_accessor :title, :description
 
-  JSON_PATH = 'public/memos.json'.freeze
+  def initialize(id = nil, title = nil, description = nil)
+    @id = id.to_i
+    @title = title
+    @description = description
+  end
+
+  def self.db_connect
+    file_path = File.expand_path('../config/database.yml', __dir__)
+    dbconf = YAML.load_file(file_path)['db']
+    PG::Connection.new(dbconf)
+  end
+
+  def self.execute_query(query, params = [], returning: false)
+    connect = db_connect
+    result = connect.exec_params(query, params)
+    connect.finish
+    returning ? result : nil
+  end
 
   def self.read_memos
-    memos = []
-    JSON.load_file(JSON_PATH).each do |m|
-      memos << Memo.new(m['id'], m['title'], m['description'])
-    end
+    result = execute_query('SELECT * FROM memos', [], returning: true)
 
-    memos
+    result.map do |row|
+      Memo.new(row['id'], row['title'], row['description'])
+    end
   end
 
   def self.read_memo(id)
@@ -22,15 +39,18 @@ class Memo
     Memo.new(id, memo.title, memo.description)
   end
 
-  def self.write_memos(memos)
-    memos_list = memos.map { |m| { id: m.id, title: m.title, description: m.description } }
-
-    File.open(JSON_PATH, 'w') { |file| file.write(memos_list.to_json) }
+  def self.insert_memo(memo)
+    query = 'INSERT into memos VALUES ($1, $2, $3)'
+    execute_query(query, [memo.id, memo.title, memo.description])
   end
 
-  def initialize(id = nil, title = nil, description = nil)
-    @id = id
-    @title = title
-    @description = description
+  def self.update_memo(memo)
+    query = 'UPDATE memos SET title = $1, description = $2 WHERE id = $3'
+    execute_query(query, [memo.title, memo.description, memo.id])
+  end
+
+  def self.delete_memo(memo)
+    query = 'DELETE FROM memos WHERE id = $1'
+    execute_query(query, [memo.id])
   end
 end
