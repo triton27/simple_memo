@@ -2,6 +2,8 @@ require 'pg'
 require 'yaml'
 
 class Memo
+  @db_connect = nil
+
   attr_reader :id
   attr_accessor :title, :description
 
@@ -12,15 +14,24 @@ class Memo
   end
 
   def self.db_connect
-    file_path = File.expand_path('../config/database.yml', __dir__)
-    dbconf = YAML.load_file(file_path)['db']
-    PG::Connection.new(dbconf)
+    @db_connect ||= begin
+      file_path = File.expand_path('../config/database.yml', __dir__)
+      dbconf = YAML.load_file(file_path)['db']
+      PG.connect(dbconf)
+    end
+  end
+
+  def self.close_connection
+    @db_connect&.close
+  end
+
+  at_exit do
+    close_connection
   end
 
   def self.execute_query(query, params = [], returning: false)
     connect = db_connect
     result = connect.exec_params(query, params)
-    connect.finish
     returning ? result : nil
   end
 
