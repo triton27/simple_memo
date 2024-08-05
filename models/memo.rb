@@ -33,10 +33,11 @@ class Memo
   end
 
   def self.read_memo(id)
-    memos = read_memos
-    memo = memos.find { |m| m.id == id }
+    query = 'SELECT * FROM memos WHERE id = $1 LIMIT 1'
+    memo = execute_query(query, [id],  returning: true)
 
-    Memo.new(id, memo.title, memo.description)
+    row = memo[0]
+    Memo.new(id, row['title'], row['description'])
   end
 
   def self.insert_memo(memo)

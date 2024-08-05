@@ -52,10 +52,9 @@ end
 
 # 編集処理
 patch '/memos/:id' do
-  memos = Memo.read_memos
   id = params['id'].to_i
+  memo = Memo.read_memo(id)
 
-  memo = memos.find { |m| m.id == id }
   memo.title = params['title']
   memo.description = params['description']
 
@@ -66,8 +65,7 @@ end
 
 # 削除処理
 delete '/memos/:id' do
-  memos = Memo.read_memos
-  memo = memos.find { |m| m.id == params['id'].to_i }
+  memo = Memo.read_memo(params['id'].to_i)
   Memo.delete_memo(memo)
 
   redirect '/memos'
