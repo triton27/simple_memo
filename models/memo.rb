@@ -29,23 +29,22 @@ class Memo
     close_connection
   end
 
-  def self.execute_query(query, params = [], returning: false)
+  def self.execute_query(query, params = [])
     connect = db_connect
-    result = connect.exec_params(query, params)
-    returning ? result : nil
+    connect.exec_params(query, params)
   end
 
   def self.read_memos
-    result = execute_query('SELECT * FROM memos', [], returning: true)
+    memos = execute_query('SELECT * FROM memos', [])
 
-    result.map do |row|
+    memos.map do |row|
       Memo.new(row['id'], row['title'], row['description'])
     end
   end
 
   def self.read_memo(id)
     query = 'SELECT * FROM memos WHERE id = $1 LIMIT 1'
-    memo = execute_query(query, [id],  returning: true)
+    memo = execute_query(query, [id])
 
     row = memo[0]
     Memo.new(id, row['title'], row['description'])
