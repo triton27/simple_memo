@@ -1,0 +1,6 @@
+db:
+  host: localhost
+  user: devuser01
+  password: devuser01
+  dbname: simple_memo
+  port: 5432
